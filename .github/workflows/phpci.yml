@@ -1,0 +1,26 @@
+name: PHP CI
+
+on:
+  - push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1.0'
+
+      - name: PHP Security Checker
+        uses: StephaneBour/actions-php-security-checker@1.1
+
+      - name: Setup project
+        run: make setup
+
+      - name: Check lint
+        run: make lint
+
+      - name: Execute tests via PHPUnit
+        run: make test
