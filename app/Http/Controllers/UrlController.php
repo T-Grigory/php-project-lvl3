@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Validator;
 
 class UrlController extends Controller
 {
-    public function index(): View|Factory
+
+    public function index(): Factory|View
     {
         return view('urls', ['urls' => DB::table('urls')->paginate(15)]);
     }
