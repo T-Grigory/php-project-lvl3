@@ -15,7 +15,20 @@ class UrlController extends Controller
 
     public function index(): Factory|View
     {
-        return view('urls', ['urls' => DB::table('urls')->paginate(15)]);
+        $urlChecks = DB::table('url_checks')
+                        ->select('url_id', 'status_code', DB::raw('MAX(created_at) as last_check_url_created_at'))
+                        ->groupBy('url_id', 'status_code')
+                        ->orderBy('url_id');
+
+
+        $urls = DB::table('urls')
+                    ->select('id', 'name', 'last_check_url_created_at', 'status_code')
+                    ->leftJoinSub($urlChecks, 'urls_checks', function ($join) {
+                        $join->on('urls.id', '=', 'urls_checks.url_id');
+                    })->orderBy('id')
+                    ->paginate(15);
+
+        return view('urls', ['urls' => $urls]);
     }
 
     public function store(Request $request): Redirector|RedirectResponse
@@ -29,36 +42,34 @@ class UrlController extends Controller
             return redirect(route('main'));
         }
 
-        $name = $request->input('url.name' );
+        $name = $request->input('url.name');
 
-        $url = $this->getData('name', $name);
+        $id = DB::table('urls')->where('name', $name)->value('id');
 
-        $message = !empty($url) ? 'Страница уже существует' : 'Страница успешно добавлена';
+        $message = !is_null($id) ? 'Страница уже существует' : 'Страница успешно добавлена';
 
-        if (empty($url)) {
-            $this->saveUrl($name);
-            $url = $this->getData('name', $name);
+        if (is_null($id)) {
+            DB::table('urls')->insert(['name' => $name]);
+            $id = DB::table('urls')->where('name', $name)->value('id');
         }
         flash($message)->info();
-        return redirect()->route('urls.show', ['url' => $url[0]->id]);
-    }
-
-    public  function saveUrl($name): void
-    {
-        DB::insert('insert into urls (name) values (?)', [$name]);
-    }
-
-    public function getData($name, $value): array
-    {
-        return DB::select("select * from urls where {$name} = :{$name}", [$name => $value]);
+        return redirect()->route('urls.show', ['url' => $id]);
     }
 
     public function show($id): View|Factory
     {
-        $url = $this->getData('id', $id);
+        $url = DB::table('urls')->find($id);
+        $urlCheck = DB::table('url_checks')->where('url_id', $id)->orderByDesc('created_at')->get();
+
         if (empty($url)) {
             abort(404);
         }
-        return view('url', ['url' => $url[0]]);
+        return view('url', ['url' => $url, 'urlCheck' => $urlCheck]);
+    }
+
+    public function check($id): Redirector|RedirectResponse
+    {
+        DB::table('url_checks')->insert(['url_id' => $id]);
+        return redirect()->route('urls.show', ['url' => $id]);
     }
 }

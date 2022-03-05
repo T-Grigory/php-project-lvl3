@@ -34,25 +34,34 @@ class UrlTest extends TestCase
 
     public function testStore()
     {
-
         $response = $this->post(route('urls.store'), ['url' => ['name' => $this->name]]);
-        $data = $this->getData();
-        $response->assertRedirect(route('urls.show', ['url' => $data[0]->id]));
 
-        $this->assertDatabaseHas('urls', ['name' => $data[0]->name]);
+        $id = DB::table('urls')->where('name', $this->name)->value('id');
+        $response->assertRedirect(route('urls.show', ['url' => $id]));
+
+        $this->assertDatabaseHas('urls', ['name' => $this->name]);
     }
 
-      public function testShow()
-      {
-          DB::insert('insert into urls (name) values (?)', [$this->name]);
-          $data = $this->getData();
+    public function testShow()
+    {
+        DB::table('urls')->insert(['name' => $this->name]);
 
-          $response = $this->get(route('urls.show', ['url' => $data[0]->id]));
-          $response->assertOk();
-      }
+        $id = DB::table('urls')->where('name', $this->name)->value('id');
 
-      private function getData(): array
-      {
-          return DB::select("select * from urls where name = :name", ['name' => $this->name]);
-      }
+        $response = $this->get(route('urls.show', ['url' => $id]));
+        $response->assertOk();
+    }
+
+    public function testCheck()
+    {
+        DB::table('urls')->insert(['name' => $this->name]);
+
+        $id = DB::table('urls')->where('name', $this->name)->value('id');
+
+        $response = $this->post(route('urlChecks', ['id' => $id]));
+
+        $response->assertRedirect(route('urls.show', ['url' => $id]));
+
+        $this->assertDatabaseHas('url_checks', ['id' => $id]);
+    }
 }
