@@ -39,7 +39,7 @@
                     <td>{{$url->status_code}}</td>
                     <td>{{$url->h1}}</td>
                     <td>{{$url->title}}</td>
-                    <td>{{$url->title}}</td>
+                    <td>{{$url->description}}</td>
                     <td>{{$url->created_at}}</td>
                 </tr>
             @endforeach

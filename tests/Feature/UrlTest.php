@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 use Illuminate\Support\Facades\DB;
 
@@ -58,7 +59,12 @@ class UrlTest extends TestCase
 
         $id = DB::table('urls')->where('name', $this->name)->value('id');
 
-        $response = $this->post(route('urlChecks', ['id' => $id]));
+        $response = $this->post(route('urlChecks', [
+            'id' => $id,
+            'client' => Http::fake([
+                    $this->name => Http::response('<title>Яндекс</title>', 200, ['Headers'])
+            ])
+        ]));
 
         $response->assertRedirect(route('urls.show', ['url' => $id]));
 

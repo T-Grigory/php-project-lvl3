@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DiDom\Document;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Routing\Redirector;
@@ -9,6 +10,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class UrlController extends Controller
 {
@@ -16,9 +19,10 @@ class UrlController extends Controller
     public function index(): Factory|View
     {
         $urlChecks = DB::table('url_checks')
-                        ->select('url_id', 'status_code', DB::raw('MAX(created_at) as last_check_url_created_at'))
-                        ->groupBy('url_id', 'status_code')
-                        ->orderBy('url_id');
+                        ->distinct('url_id')
+                        ->select('url_id', 'status_code', 'created_at as last_check_url_created_at')
+                        ->orderBy('url_id')
+                        ->orderByDesc('last_check_url_created_at');
 
 
         $urls = DB::table('urls')
@@ -67,9 +71,28 @@ class UrlController extends Controller
         return view('url', ['url' => $url, 'urlCheck' => $urlCheck]);
     }
 
-    public function check($id): Redirector|RedirectResponse
+    public function check($id, $client = null): Redirector|RedirectResponse
     {
-        DB::table('url_checks')->insert(['url_id' => $id]);
+        $url = DB::table('urls')->find($id);
+        if (empty($url)) {
+            abort(404);
+        }
+        $response = is_null($client) ? Http::get($url->name) : $client;
+        $document = new Document($response->body());
+        $title = optional($document->first('title'))->text();
+        $h1 = optional($document->first('h1'))->text();
+        $description = optional($document->first('meta[name=description]'))->attr('content');
+
+        $statusCode = $response->status();
+
+        DB::table('url_checks')->insert([
+            'url_id' => $id,
+            'status_code' => $statusCode,
+            'h1' => Str::limit($h1, 10),
+            'title' => Str::limit($title, 30),
+            'description' => Str::limit($description, 30)
+        ]);
+
         return redirect()->route('urls.show', ['url' => $id]);
     }
 }

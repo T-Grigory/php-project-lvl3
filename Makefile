@@ -25,6 +25,9 @@ log:
 test:
 	php artisan test
 
+test-coverage:
+	php artisan test --coverage
+
 deploy:
 	git push heroku
 
