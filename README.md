@@ -9,7 +9,7 @@
 ## About Page Analyzer
 > Page Analazer - a site that analyzes the specified pages for SEO suitability similar to varvy
 
-### Install
+### Installation
 ***
 To install Page Analyzer run the command: *make setup*
 
