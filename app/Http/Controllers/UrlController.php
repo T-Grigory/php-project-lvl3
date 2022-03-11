@@ -42,9 +42,8 @@ class UrlController extends Controller
         ]);
 
         if ($validator->fails()) {
-            session(['error' => 'The field must not be empty']);
             flash('Некорректный URL')->error();
-            return redirect(route('main'));
+            return redirect(route('main'))->withErrors($validator->errors());
         }
 
         $name = $request->input('url.name');
