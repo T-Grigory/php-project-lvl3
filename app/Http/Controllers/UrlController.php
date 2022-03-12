@@ -13,10 +13,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 
-
 class UrlController extends Controller
 {
-
     public function index(): Factory|View
     {
         $urlChecks = DB::table('url_checks')

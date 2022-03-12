@@ -10,12 +10,6 @@ use Illuminate\Support\Facades\DB;
 
 class UrlTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
-
     use RefreshDatabase;
 
     private string $name = 'https://ya.ru';
