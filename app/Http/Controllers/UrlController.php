@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
+use Carbon\Carbon;
 
 class UrlController extends Controller
 {
@@ -52,7 +53,7 @@ class UrlController extends Controller
         $message = !is_null($id) ? 'Страница уже существует' : 'Страница успешно добавлена';
 
         if (is_null($id)) {
-            DB::table('urls')->insert(['name' => $name]);
+            DB::table('urls')->insert(['name' => $name, 'created_at' => Carbon::now()]);
             $id = DB::table('urls')->where('name', $name)->value('id');
         }
         flash($message)->info();
@@ -89,7 +90,8 @@ class UrlController extends Controller
             'status_code' => $statusCode,
             'h1' => $h1,
             'title' => $title,
-            'description' => $description
+            'description' => $description,
+            'created_at' => Carbon::now()
         ]);
 
         return redirect()->route('urls.show', ['url' => $id]);
