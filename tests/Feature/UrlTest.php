@@ -48,7 +48,7 @@ class UrlTest extends TestCase
         $response->assertOk();
     }
 
-    public function testCheck()
+    public function testCheck(): void
     {
         DB::table('urls')->insert(['name' => $this->name, 'created_at' => Carbon::now()]);
 
@@ -56,10 +56,9 @@ class UrlTest extends TestCase
 
         $response = $this->post(route('urlChecks', [
             'id' => $id,
-//            'client' => Http::fake([
-//                    $this->name => Http::response('<title>Яндекс</title>', 200, ['Headers'])
-//            ])
-            'data' => ['name' => $this->name, 'body' => '<title>Яндекс</title>', 'status' => 200, 'headers' => ['Headers']]
+            'client' => Http::fake([
+                    $this->name => Http::response('<title>Яндекс</title>')
+            ])
         ]));
 
         $response->assertRedirect(route('urls.show', ['url' => $id]));
