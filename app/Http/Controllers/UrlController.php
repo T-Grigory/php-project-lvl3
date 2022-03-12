@@ -77,7 +77,7 @@ class UrlController extends Controller
         if (empty($url)) {
             abort(404);
         }
-        $response = is_null($client) ? Http::get($url->name) : $client;
+        $response = $client ?? Http::get($url->name);
         $document = new Document($response->body());
         $title = optional($document->first('title'))->text();
         $h1 = optional($document->first('h1'))->text();
