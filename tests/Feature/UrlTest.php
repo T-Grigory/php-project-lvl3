@@ -54,11 +54,12 @@ class UrlTest extends TestCase
 
         $id = DB::table('urls')->where('name', $this->name)->value('id');
 
+        Http::fake([
+            $this->name => Http::response('<title>Яндекс</title>')
+        ]);
+
         $response = $this->post(route('urlChecks', [
-            'id' => $id,
-            'client' => Http::fake([
-                    $this->name => Http::response('<title>Яндекс</title>')
-            ])
+            'id' => $id
         ]));
 
         $response->assertRedirect(route('urls.show', ['url' => $id]));
