@@ -37,9 +37,9 @@
                 <tr>
                     <td>{{$url->id}}</td>
                     <td>{{$url->status_code}}</td>
-                    <td>{{$url->h1}}</td>
-                    <td>{{$url->title}}</td>
-                    <td>{{$url->description}}</td>
+                    <td>{{Str::limit($url->h1, 10)}}</td>
+                    <td>{{Str::limit($url->title, 30)}}</td>
+                    <td>{{Str::limit($url->description, 30)}}</td>
                     <td>{{$url->created_at}}</td>
                 </tr>
             @endforeach

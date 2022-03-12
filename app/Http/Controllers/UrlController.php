@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use DiDom\Document;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Routing\Controller;
 use Illuminate\Routing\Redirector;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
+
 
 class UrlController extends Controller
 {
@@ -30,7 +31,7 @@ class UrlController extends Controller
                     ->leftJoinSub($urlChecks, 'urls_checks', function ($join) {
                         $join->on('urls.id', '=', 'urls_checks.url_id');
                     })->orderBy('id')
-                    ->paginate(15);
+                    ->paginate();
 
         return view('urls', ['urls' => $urls]);
     }
@@ -88,9 +89,9 @@ class UrlController extends Controller
         DB::table('url_checks')->insert([
             'url_id' => $id,
             'status_code' => $statusCode,
-            'h1' => Str::limit($h1, 10),
-            'title' => Str::limit($title, 30),
-            'description' => Str::limit($description, 30)
+            'h1' => $h1,
+            'title' => $title,
+            'description' => $description
         ]);
 
         return redirect()->route('urls.show', ['url' => $id]);
