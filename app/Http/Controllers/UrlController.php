@@ -71,7 +71,7 @@ class UrlController extends Controller
         return view('url', ['url' => $url, 'urlCheck' => $urlCheck]);
     }
 
-    public function check(int $id, object $client = null): Redirector|RedirectResponse
+    public function check(int $id, Http $client = null): Redirector|RedirectResponse
     {
         $url = DB::table('urls')->find($id);
         if (empty($url)) {
