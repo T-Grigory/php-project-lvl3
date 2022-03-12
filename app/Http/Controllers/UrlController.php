@@ -71,7 +71,7 @@ class UrlController extends Controller
         return view('url', ['url' => $url, 'urlCheck' => $urlCheck]);
     }
 
-    public function check(int $id): Redirector|RedirectResponse //Http $client = null): Redirector|RedirectResponse
+    public function check(int $id, array $data = null): Redirector|RedirectResponse //Http $client = null): Redirector|RedirectResponse
     {
         $url = DB::table('urls')->find($id);
         if (empty($url)) {
@@ -79,7 +79,10 @@ class UrlController extends Controller
         }
 
         //$response = $client ?? Http::get($url->name);
-        $response = Http::get($url->name);
+        $response = !is_null($data) ?
+            Http::fake([$data['name'] => Http::response($data['body'], $data['status'], $data['headers'])]) :
+            Http::get($url->name);
+
         $document = new Document($response->body());
         $title = optional($document->first('title'))->text();
         $h1 = optional($document->first('h1'))->text();
