@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Http;
@@ -39,7 +40,7 @@ class UrlTest extends TestCase
 
     public function testShow()
     {
-        DB::table('urls')->insert(['name' => $this->name]);
+        DB::table('urls')->insert(['name' => $this->name, 'created_at' => Carbon::now()]);
 
         $id = DB::table('urls')->where('name', $this->name)->value('id');
 
@@ -49,7 +50,7 @@ class UrlTest extends TestCase
 
     public function testCheck()
     {
-        DB::table('urls')->insert(['name' => $this->name]);
+        DB::table('urls')->insert(['name' => $this->name, 'created_at' => Carbon::now()]);
 
         $id = DB::table('urls')->where('name', $this->name)->value('id');
 
