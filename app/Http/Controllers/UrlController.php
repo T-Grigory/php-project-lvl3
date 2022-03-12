@@ -43,7 +43,7 @@ class UrlController extends Controller
 
         if ($validator->fails()) {
             flash('Некорректный URL')->error();
-            return redirect(route('main'))->withErrors($validator->errors());
+            return redirect()->route('main')->withErrors($validator->errors());
         }
 
         $name = $request->input('url.name');
@@ -60,7 +60,7 @@ class UrlController extends Controller
         return redirect()->route('urls.show', ['url' => $id]);
     }
 
-    public function show($id): View|Factory
+    public function show(int $id): View|Factory
     {
         $url = DB::table('urls')->find($id);
         $urlCheck = DB::table('url_checks')->where('url_id', $id)->orderByDesc('created_at')->get();
@@ -71,7 +71,7 @@ class UrlController extends Controller
         return view('url', ['url' => $url, 'urlCheck' => $urlCheck]);
     }
 
-    public function check($id, $client = null): Redirector|RedirectResponse
+    public function check(int $id, object $client = null): Redirector|RedirectResponse
     {
         $url = DB::table('urls')->find($id);
         if (empty($url)) {
