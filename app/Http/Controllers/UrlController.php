@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class UrlController extends Controller
 {
@@ -88,12 +89,12 @@ class UrlController extends Controller
         DB::table('url_checks')->insert([
             'url_id' => $id,
             'status_code' => $statusCode,
-            'h1' => $h1,
-            'title' => $title,
-            'description' => $description,
+            'h1' => Str::limit($h1, 255, ''),
+            'title' => Str::limit($title, 255, ''),
+            'description' => Str::limit($description, 255, ''),
             'created_at' => Carbon::now()
         ]);
-
+        flash('Страница успешно проверена')->info();
         return redirect()->route('urls.show', ['url' => $id]);
     }
 }
