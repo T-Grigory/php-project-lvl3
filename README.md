@@ -1,8 +1,8 @@
 # [php-project-lvl3](https://page-analyzer-2022.herokuapp.com/)
 
 [![Action status](https://github.com/T-Grigory/php-project-lvl3/workflows/hexlet-check/badge.svg)](https://github.com/T-Grigory/php-project-lvl3/actions)
-![Action CI](https://github.com/T-Grigory/php-project-lvl3/actions/workflows/phpci.yml/badge.svg)
-[![Maintainability](https://api.codeclimate.com/v1/badges/947ea1ea33377997bf53/maintainability)](https://api.codeclimate.com/v1/badges/947ea1ea33377997bf53/maintainability)
+[![Action CI](https://github.com/T-Grigory/php-project-lvl3/actions/workflows/phpci.yml/badge.svg)](https://github.com/T-Grigory/php-project-lvl3/actions)
+[![Maintainability](https://api.codeclimate.com/v1/badges/947ea1ea33377997bf53/maintainability)](https://codeclimate.com/github/T-Grigory/php-project-lvl3)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/947ea1ea33377997bf53/test_coverage)](https://codeclimate.com/github/T-Grigory/php-project-lvl3/test_coverage)
 
 

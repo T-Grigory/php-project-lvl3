@@ -75,15 +75,22 @@ class UrlController extends Controller
     public function check(int $id): Redirector|RedirectResponse
     {
         $url = DB::table('urls')->find($id);
+
         if (empty($url)) {
             abort(404);
         }
-        $response = Http::get($url->name);
+
+        try {
+            $response = Http::get($url->name);
+        } catch (\Exception $exception) {
+            flash($exception->getMessage())->error();
+            return redirect()->route('urls.show', ['url' => $id]);
+        }
+
         $document = new Document($response->body());
         $title = optional($document->first('title'))->text();
         $h1 = optional($document->first('h1'))->text();
         $description = optional($document->first('meta[name=description]'))->attr('content');
-
         $statusCode = $response->status();
 
         DB::table('url_checks')->insert([
@@ -94,6 +101,7 @@ class UrlController extends Controller
             'description' => Str::limit($description, 255, ''),
             'created_at' => Carbon::now()
         ]);
+
         flash('Страница успешно проверена')->info();
         return redirect()->route('urls.show', ['url' => $id]);
     }

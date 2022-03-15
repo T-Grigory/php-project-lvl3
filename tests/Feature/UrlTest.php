@@ -4,8 +4,6 @@ namespace Tests\Feature;
 
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 use Illuminate\Support\Facades\DB;
 
@@ -13,57 +11,107 @@ class UrlTest extends TestCase
 {
     use RefreshDatabase;
 
-    private string $name = 'https://ya.ru';
-
-    public function testMain()
+    public function setUp(): void
     {
-        $response = $this->get(route('main'));
+        parent::setUp();
 
-        $response->assertStatus(200);
+        $urls = [
+            'https://mail.ru',
+            'https://ru.hexlet.io',
+            'https://www.google.ru'
+        ];
+
+        array_walk(
+            $urls,
+            fn($url) => DB::table('urls')->insert(['name' => $url, 'created_at' => Carbon::now()])
+        );
     }
 
-    public function testIndex()
+    public function storeProvider(): array
     {
-        $response = $this->get(route('urls.index'));
-        $response->assertOk();
+        return [
+            ['https://yandex.ru'],
+            ['https://sibnet.ru'],
+            ['https://www.google.ru'],
+        ];
     }
 
-    public function testStore()
-    {
-        $response = $this->post(route('urls.store'), ['url' => ['name' => $this->name]]);
+    /**
+     * @dataProvider storeProvider
+     * @return void
+     */
 
-        $id = DB::table('urls')->where('name', $this->name)->value('id');
+    public function testStore($name)
+    {
+        $response = $this->post(route('urls.store'), ['url' => ['name' => $name]]);
+
+        $id = DB::table('urls')->where('name', $name)->value('id');
         $response->assertRedirect(route('urls.show', ['url' => $id]));
 
-        $this->assertDatabaseHas('urls', ['name' => $this->name]);
+        $this->assertDatabaseHas('urls', ['name' => $name]);
     }
 
-    public function testShow()
+    /**
+     * @dataProvider failedStoreProvider
+     * @return void
+     */
+
+    public function testFailedStore($name)
     {
-        DB::table('urls')->insert(['name' => $this->name, 'created_at' => Carbon::now()]);
+        $response = $this->post(route('urls.store'), ['url' => ['name' => $name]]);
 
-        $id = DB::table('urls')->where('name', $this->name)->value('id');
+        $response->assertRedirect(route('main'));
+        $this->assertDatabaseMissing('urls', ['name' => $name]);
+    }
 
+    public function failedStoreProvider(): array
+    {
+        return [
+            [''],
+            ['sfdsfsdfs'],
+            ['mail.ru']
+        ];
+    }
+
+    /**
+     * @dataProvider showProvider
+     * @param $id
+     * @return void
+     */
+
+    public function testShow($id)
+    {
         $response = $this->get(route('urls.show', ['url' => $id]));
         $response->assertOk();
     }
 
-    public function testCheck(): void
+    public function showProvider(): array
     {
-        DB::table('urls')->insert(['name' => $this->name, 'created_at' => Carbon::now()]);
+        return [
+            ['id' => 1],
+            ['id' => 2],
+            ['id' => 3]
+        ];
+    }
 
-        $id = DB::table('urls')->where('name', $this->name)->value('id');
+    /**
+     * @dataProvider failedShowProvider
+     * @param $id
+     * @return void
+     */
 
-        Http::fake([
-            $this->name => Http::response('<title>Яндекс</title>')
-        ]);
+    public function testFailedShow($id)
+    {
+        $response = $this->get(route('urls.show', ['url' => $id]));
+        $response->assertNotFound();
+    }
 
-        $response = $this->post(route('urlChecks', [
-            'id' => $id
-        ]));
-
-        $response->assertRedirect(route('urls.show', ['url' => $id]));
-
-        $this->assertDatabaseHas('url_checks', ['id' => $id]);
+    public function failedShowProvider(): array
+    {
+        return [
+            ['id' => 4],
+            ['id' => 5],
+            ['id' => 6]
+        ];
     }
 }
