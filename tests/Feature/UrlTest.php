@@ -27,6 +27,13 @@ class UrlTest extends TestCase
         );
     }
 
+    public function testIndex(): void
+    {
+        $response = $this->get(route('urls.index'));
+
+        $response->assertStatus(200);
+    }
+
     public function storeProvider(): array
     {
         return [

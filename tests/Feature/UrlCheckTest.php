@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use mysql_xdevapi\Exception;
 use Tests\TestCase;
 
 class UrlCheckTest extends TestCase
@@ -16,7 +17,7 @@ class UrlCheckTest extends TestCase
         $urls = [
             'https://mail.ru',
             'https://ru.hexlet.io',
-            'https://www.google.ru'
+            'https://www.google.ru',
         ];
 
         array_walk(
@@ -77,9 +78,9 @@ class UrlCheckTest extends TestCase
     public function failedCheckProvider(): array
     {
         return [
-            ['id' => 4],
             ['id' => 5],
-            ['id' => 6]
+            ['id' => 6],
+            ['id' => 7]
         ];
     }
 
