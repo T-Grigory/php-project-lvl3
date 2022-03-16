@@ -83,5 +83,4 @@ class UrlCheckTest extends TestCase
             ['id' => 7]
         ];
     }
-
 }
