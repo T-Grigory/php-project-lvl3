@@ -82,19 +82,10 @@ class UrlController extends Controller
 
         try {
             $response = Http::get($url->name);
-
-            if (!$response->successful()) {
-                throw new \Exception($response->reason());
-            }
-
-
         } catch (\Exception $exception) {
-            //dd($exception);
             flash($exception->getMessage())->error();
             return redirect()->route('urls.show', ['url' => $id]);
         }
-
-
 
         $document = new Document($response->body());
         $title = optional($document->first('title'))->text();
