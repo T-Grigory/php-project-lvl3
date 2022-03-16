@@ -34,6 +34,22 @@ class UrlTest extends TestCase
         $response->assertStatus(200);
     }
 
+    /**
+     * @dataProvider storeProvider
+     * @param string name
+     * @return void
+     */
+
+    public function testStore(string $name)
+    {
+        $response = $this->post(route('urls.store'), ['url' => ['name' => $name]]);
+
+        $id = DB::table('urls')->where('name', $name)->value('id');
+        $response->assertRedirect(route('urls.show', ['url' => $id]));
+
+        $this->assertDatabaseHas('urls', ['name' => $name]);
+    }
+
     public function storeProvider(): array
     {
         return [
@@ -44,26 +60,12 @@ class UrlTest extends TestCase
     }
 
     /**
-     * @dataProvider storeProvider
-     * @return void
-     */
-
-    public function testStore($name)
-    {
-        $response = $this->post(route('urls.store'), ['url' => ['name' => $name]]);
-
-        $id = DB::table('urls')->where('name', $name)->value('id');
-        $response->assertRedirect(route('urls.show', ['url' => $id]));
-
-        $this->assertDatabaseHas('urls', ['name' => $name]);
-    }
-
-    /**
      * @dataProvider failedStoreProvider
+     * @param string name
      * @return void
      */
 
-    public function testFailedStore($name)
+    public function testFailedStore(string $name)
     {
         $response = $this->post(route('urls.store'), ['url' => ['name' => $name]]);
 
@@ -82,11 +84,11 @@ class UrlTest extends TestCase
 
     /**
      * @dataProvider showProvider
-     * @param $id
+     * @param int $id
      * @return void
      */
 
-    public function testShow($id)
+    public function testShow(int $id)
     {
         $response = $this->get(route('urls.show', ['url' => $id]));
         $response->assertOk();
@@ -103,11 +105,11 @@ class UrlTest extends TestCase
 
     /**
      * @dataProvider failedShowProvider
-     * @param $id
+     * @param int $id
      * @return void
      */
 
-    public function testFailedShow($id)
+    public function testFailedShow(int $id)
     {
         $response = $this->get(route('urls.show', ['url' => $id]));
         $response->assertNotFound();

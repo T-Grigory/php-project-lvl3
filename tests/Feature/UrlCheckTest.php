@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use mysql_xdevapi\Exception;
 use Tests\TestCase;
 
 class UrlCheckTest extends TestCase
@@ -28,12 +27,12 @@ class UrlCheckTest extends TestCase
 
     /**
      * @dataProvider checkProvider
-     * @param $id
-     * @param $name
+     * @param int $id
+     * @param string $name
      * @return void
      */
 
-    public function testCheck($id, $name): void
+    public function testCheck(int $id, string $name): void
     {
         $body = file_get_contents(__DIR__ . "/fixtures/{$id}.html");
 
@@ -61,11 +60,11 @@ class UrlCheckTest extends TestCase
 
     /**
      * @dataProvider failedCheckProvider
-     * @param $id
+     * @param int $id
      * @return void
      */
 
-    public function testFailedCheck($id): void
+    public function testFailedCheck(int $id): void
     {
         $response = $this->post(route('urlChecks', [
             'id' => $id
