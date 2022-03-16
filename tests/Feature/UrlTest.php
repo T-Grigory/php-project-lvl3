@@ -36,7 +36,7 @@ class UrlTest extends TestCase
 
     /**
      * @dataProvider storeProvider
-     * @param string name
+     * @param mixed name
      * @return void
      */
 
@@ -61,7 +61,7 @@ class UrlTest extends TestCase
 
     /**
      * @dataProvider failedStoreProvider
-     * @param string name
+     * @param mixed name
      * @return void
      */
 
@@ -84,7 +84,7 @@ class UrlTest extends TestCase
 
     /**
      * @dataProvider showProvider
-     * @param int $id
+     * @param mixed $id
      * @return void
      */
 
@@ -105,7 +105,7 @@ class UrlTest extends TestCase
 
     /**
      * @dataProvider failedShowProvider
-     * @param int $id
+     * @param mixed $id
      * @return void
      */
 
