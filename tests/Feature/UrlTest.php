@@ -36,11 +36,11 @@ class UrlTest extends TestCase
 
     /**
      * @dataProvider storeProvider
-     * @param mixed name
+     * @param string name
      * @return void
      */
 
-    public function testStore(mixed $name)
+    public function testStore(string $name)
     {
         $response = $this->post(route('urls.store'), ['url' => ['name' => $name]]);
 
@@ -53,15 +53,15 @@ class UrlTest extends TestCase
     public function storeProvider(): array
     {
         return [
-            ['https://yandex.ru'],
-            ['https://sibnet.ru'],
-            ['https://www.google.ru'],
+            ['name' => 'https://yandex.ru'],
+            ['name' => 'https://sibnet.ru'],
+            ['name' => 'https://www.google.ru'],
         ];
     }
 
     /**
      * @dataProvider failedStoreProvider
-     * @param mixed name
+     * @param string name
      * @return void
      */
 
@@ -76,19 +76,19 @@ class UrlTest extends TestCase
     public function failedStoreProvider(): array
     {
         return [
-            [''],
-            ['sfdsfsdfs'],
-            ['mail.ru']
+            ['name' => ''],
+            ['name' => 'sfdsfsdfs'],
+            ['name' => 'mail.ru']
         ];
     }
 
     /**
      * @dataProvider showProvider
-     * @param mixed $id
+     * @param int $id
      * @return void
      */
 
-    public function testShow(mixed $id)
+    public function testShow(int $id)
     {
         $response = $this->get(route('urls.show', ['url' => $id]));
         $response->assertOk();
@@ -105,11 +105,11 @@ class UrlTest extends TestCase
 
     /**
      * @dataProvider failedShowProvider
-     * @param mixed $id
+     * @param int $id
      * @return void
      */
 
-    public function testFailedShow(mixed $id)
+    public function testFailedShow(int $id)
     {
         $response = $this->get(route('urls.show', ['url' => $id]));
         $response->assertNotFound();
