@@ -36,7 +36,7 @@ class UrlTest extends TestCase
 
     /**
      * @dataProvider storeProvider
-     * @param string name
+     * @param string $name
      * @return void
      */
 
@@ -61,11 +61,11 @@ class UrlTest extends TestCase
 
     /**
      * @dataProvider failedStoreProvider
-     * @param string name
+     * @param string $name
      * @return void
      */
 
-    public function testFailedStore(mixed $name)
+    public function testFailedStore(string $name)
     {
         $response = $this->post(route('urls.store'), ['url' => ['name' => $name]]);
 
