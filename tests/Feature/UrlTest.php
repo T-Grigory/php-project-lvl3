@@ -40,7 +40,7 @@ class UrlTest extends TestCase
      * @return void
      */
 
-    public function testStore(string $name)
+    public function testStore(mixed $name)
     {
         $response = $this->post(route('urls.store'), ['url' => ['name' => $name]]);
 
@@ -65,7 +65,7 @@ class UrlTest extends TestCase
      * @return void
      */
 
-    public function testFailedStore(string $name)
+    public function testFailedStore(mixed $name)
     {
         $response = $this->post(route('urls.store'), ['url' => ['name' => $name]]);
 
@@ -88,7 +88,7 @@ class UrlTest extends TestCase
      * @return void
      */
 
-    public function testShow(int $id)
+    public function testShow(mixed $id)
     {
         $response = $this->get(route('urls.show', ['url' => $id]));
         $response->assertOk();
@@ -109,7 +109,7 @@ class UrlTest extends TestCase
      * @return void
      */
 
-    public function testFailedShow(int $id)
+    public function testFailedShow(mixed $id)
     {
         $response = $this->get(route('urls.show', ['url' => $id]));
         $response->assertNotFound();
