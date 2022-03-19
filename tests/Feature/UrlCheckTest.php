@@ -44,9 +44,8 @@ class UrlCheckTest extends TestCase
         mixed $h1,
         mixed $title,
         mixed $description
-    ): void
-    {
-        $body = file_get_contents(__DIR__ . "/fixtures/{$urlId}.html");
+    ): void {
+        $body = file_get_contents(__DIR__ . "/fixtures/$urlId.html");
 
         Http::fake([
             $name => Http::response($body)
