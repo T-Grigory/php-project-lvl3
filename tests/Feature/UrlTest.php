@@ -16,14 +16,15 @@ class UrlTest extends TestCase
         parent::setUp();
 
         $urls = [
-            'https://mail.ru',
-            'https://ru.hexlet.io',
-            'https://www.google.ru'
+            ['id' => 1, 'name' => 'https://mail.ru'],
+            ['id' => 2, 'name' => 'https://ru.hexlet.io'],
+            ['id' => 3, 'name' => 'https://www.google.ru']
         ];
 
         array_walk(
             $urls,
-            fn($url) => DB::table('urls')->insert(['name' => $url, 'created_at' => Carbon::now()])
+            fn($url) => DB::table('urls')
+                ->insert(['id' => $url['id'], 'name' => $url['name'], 'created_at' => Carbon::now()])
         );
     }
 
@@ -85,21 +86,24 @@ class UrlTest extends TestCase
     /**
      * @dataProvider showProvider
      * @param int $id
+     * @param string $name
      * @return void
      */
 
-    public function testShow(int $id)
+    public function testShow(int $id, string $name)
     {
         $response = $this->get(route('urls.show', ['url' => $id]));
         $response->assertOk();
+        $date = Carbon::now();
+        $response->assertSee(["<td>{$id}</td>","<td>{$name}</td>", "<td>{$date}</td>"], false);
     }
 
     public function showProvider(): array
     {
         return [
-            ['id' => 1],
-            ['id' => 2],
-            ['id' => 3]
+            ['id' => 1, 'name' => 'https://mail.ru'],
+            ['id' => 2, 'name' => 'https://ru.hexlet.io'],
+            ['id' => 3, 'name' => 'https://www.google.ru']
         ];
     }
 

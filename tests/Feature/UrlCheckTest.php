@@ -14,47 +14,88 @@ class UrlCheckTest extends TestCase
         parent::setUp();
 
         $urls = [
-            'https://mail.ru',
-            'https://ru.hexlet.io',
-            'https://www.google.ru',
+            ['id' => 1, 'name' => 'https://mail.ru'],
+            ['id' => 2, 'name' => 'https://ru.hexlet.io'],
+            ['id' => 3, 'name' => 'https://www.google.ru']
         ];
 
         array_walk(
             $urls,
-            fn($url) => DB::table('urls')->insert(['name' => $url, 'created_at' => Carbon::now()])
+            fn($url) => DB::table('urls')
+                ->insert(['id' => $url['id'], 'name' => $url['name'], 'created_at' => Carbon::now()])
         );
     }
 
     /**
      * @dataProvider checkProvider
-     * @param int $id
+     * @param int $urlId
      * @param string $name
+     * @param int $statusCode
+     * @param mixed $h1
+     * @param mixed $title
+     * @param mixed $description
      * @return void
      */
 
-    public function testCheck(int $id, string $name): void
+    public function testCheck(
+        int $urlId,
+        string $name,
+        int $statusCode,
+        mixed $h1,
+        mixed $title,
+        mixed $description
+    ): void
     {
-        $body = file_get_contents(__DIR__ . "/fixtures/{$id}.html");
+        $body = file_get_contents(__DIR__ . "/fixtures/{$urlId}.html");
 
         Http::fake([
             $name => Http::response($body)
         ]);
 
         $response = $this->post(route('urlChecks', [
-            'id' => $id
+            'id' => $urlId
         ]));
 
-        $response->assertRedirect(route('urls.show', ['url' => $id]));
+        $response->assertRedirect(route('urls.show', ['url' => $urlId]));
 
-        $this->assertDatabaseHas('url_checks', ['url_id' => $id]);
+        $this->assertDatabaseHas('url_checks', [
+            'id' => 1,
+            'url_id' => $urlId,
+            'status_code' => $statusCode,
+            'h1' => $h1,
+            'title' => $title,
+            'description' => $description,
+            'created_at' => Carbon::now()
+        ]);
     }
 
     public function checkProvider(): array
     {
         return [
-           ['id' => 1, 'name' => 'https://mail.ru'],
-           ['id' => 2, 'name' => 'https://ru.hexlet.io'],
-           ['id' => 3, 'name' => 'https://www.google.ru']
+            [
+               'urlId' => 1,
+               'name' => 'https://mail.ru',
+               'statusCode' => 200,
+               'h1' => null,
+               'title' => 'Mail.ru: почта, поиск в интернете, новости, игры',
+               'description' => 'Почта Mail.ru — крупнейшая бесплатная почта'
+            ],
+            [
+                'url_id' => 2,
+                'name' => 'https://ru.hexlet.io',
+                'status_code' => 200,
+                'h1' => 'Онлайн школа программирования, за выпускниками которой охотятся компании',
+                'title' => 'Хекслет — больше чем школа программирования. Онлайн курсы, сообщество программистов',
+                'description' => 'Живое онлайн сообщество программистов и разработчиков'
+            ],
+            [
+                'url_id' => 3,
+                'name' => 'https://www.google.ru',
+                'status_code' => 200,
+                'h1' => null,
+                'title' => 'Google',
+                'description' => null
+            ]
         ];
     }
 

@@ -22,7 +22,6 @@ return new class extends Migration
             $table->string('h1')->nullable();
             $table->string('title')->nullable();
             $table->string('description')->nullable();
-            //$table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('created_at');
         });
     }
