@@ -19,21 +19,16 @@ class UrlController extends Controller
 {
     public function index(): Factory|View
     {
-        $urlChecks = DB::table('url_checks')
-                        ->distinct('url_id')
-                        ->select('url_id', 'status_code', 'created_at as last_check_url_created_at')
-                        ->orderBy('url_id')
-                        ->orderByDesc('last_check_url_created_at');
+        $urls = DB::table('urls')->paginate(15);
 
+        $lastChecks = DB::table('url_checks')
+            ->distinct('url_id')
+            ->orderBy('url_id')
+            ->latest()
+            ->get()
+            ->keyBy('url_id');
 
-        $urls = DB::table('urls')
-                    ->select('id', 'name', 'last_check_url_created_at', 'status_code')
-                    ->leftJoinSub($urlChecks, 'urls_checks', function ($join) {
-                        $join->on('urls.id', '=', 'urls_checks.url_id');
-                    })->orderBy('id')
-                    ->paginate();
-
-        return view('urls', ['urls' => $urls]);
+        return view('urls', compact('urls', 'lastChecks'));
     }
 
     public function store(Request $request): Redirector|RedirectResponse
@@ -47,15 +42,16 @@ class UrlController extends Controller
             return redirect()->route('main')->withErrors($validator->errors());
         }
 
-        $name = $request->input('url.name');
+        $name = $validator->validated()['url']['name'];
 
         $id = DB::table('urls')->where('name', $name)->value('id');
 
-        $message = !is_null($id) ? 'Страница уже существует' : 'Страница успешно добавлена';
+        $message = 'Страница уже существует';
 
         if (is_null($id)) {
             DB::table('urls')->insert(['name' => $name, 'created_at' => Carbon::now()]);
             $id = DB::table('urls')->where('name', $name)->value('id');
+            $message = 'Страница успешно добавлена';
         }
         flash($message)->info();
         return redirect()->route('urls.show', ['url' => $id]);
@@ -77,21 +73,21 @@ class UrlController extends Controller
         $url = DB::table('urls')->find($id);
 
         if (empty($url)) {
-            abort(404);
+            abort_unless($url, 404);
         }
 
         try {
             $response = Http::get($url->name);
+
+            $document = new Document($response->body());
+            $title = optional($document->first('title'))->text();
+            $h1 = optional($document->first('h1'))->text();
+            $description = optional($document->first('meta[name=description]'))->attr('content');
+            $statusCode = $response->status();
         } catch (\Exception $exception) {
             flash($exception->getMessage())->error();
             return redirect()->route('urls.show', ['url' => $id]);
         }
-
-        $document = new Document($response->body());
-        $title = optional($document->first('title'))->text();
-        $h1 = optional($document->first('h1'))->text();
-        $description = optional($document->first('meta[name=description]'))->attr('content');
-        $statusCode = $response->status();
 
         DB::table('url_checks')->insert([
             'url_id' => $id,

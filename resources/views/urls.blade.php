@@ -11,12 +11,12 @@
                     <th>Последняя проверка</th>
                     <th>Код ответа</th>
                 </tr>
-                @foreach ($urls->items() as $url)
+                @foreach ($urls as $url)
                     <tr>
                         <td>{{ $url->id }}</td>
                         <td><a href="{{route('urls.show', ['url' => $url->id])}}">{{$url->name}}</a></td>
-                        <td>{{$url->last_check_url_created_at}}</td>
-                        <td>{{$url->status_code}}</td>
+                        <td>{{$lastChecks[$url->id]->created_at ?? ''}}</td>
+                        <td>{{$lastChecks[$url->id]->status_code ?? ''}}</td>
                     </tr>
                 @endforeach
             </table>
