@@ -45,13 +45,13 @@ class UrlCheckTest extends TestCase
         mixed $title,
         mixed $description
     ): void {
-        $body = file_get_contents(__DIR__ . "/fixtures/$urlId.html");
+        $body = file_get_contents(__DIR__ . "/fixtures/{$urlId}.html");
 
         Http::fake([
             $name => Http::response($body)
         ]);
 
-        $response = $this->post(route('urlChecks', [
+        $response = $this->post(route('urlChecks.store', [
             'id' => $urlId
         ]));
 
@@ -63,8 +63,7 @@ class UrlCheckTest extends TestCase
             'status_code' => $statusCode,
             'h1' => $h1,
             'title' => $title,
-            'description' => $description,
-            'created_at' => Carbon::now()
+            'description' => $description
         ]);
     }
 
@@ -106,7 +105,7 @@ class UrlCheckTest extends TestCase
 
     public function testFailedCheck(int $id): void
     {
-        $response = $this->post(route('urlChecks', [
+        $response = $this->post(route('urlChecks.store', [
             'id' => $id
         ]));
 

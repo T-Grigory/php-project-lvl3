@@ -21,7 +21,7 @@ class UrlController extends Controller
     {
         $urls = DB::table('urls')->paginate(15);
 
-        $lastChecks = DB::table('url_checks')
+         $lastChecks = DB::table('url_checks')
             ->distinct('url_id')
             ->orderBy('url_id')
             ->latest()
@@ -43,14 +43,16 @@ class UrlController extends Controller
         }
 
         $name = $validator->validated()['url']['name'];
+        $parsedUrl = parse_url($name);
+        $partUrl = "{$parsedUrl['scheme']}://{$parsedUrl['host']}";
 
-        $id = DB::table('urls')->where('name', $name)->value('id');
+        $id = DB::table('urls')->where('name', $partUrl)->value('id');
 
         $message = 'Страница уже существует';
 
         if (is_null($id)) {
-            DB::table('urls')->insert(['name' => $name, 'created_at' => Carbon::now()]);
-            $id = DB::table('urls')->where('name', $name)->value('id');
+            DB::table('urls')->insert(['name' => $partUrl, 'created_at' => Carbon::now()]);
+            $id = DB::table('urls')->where('name', $partUrl)->value('id');
             $message = 'Страница успешно добавлена';
         }
         flash($message)->info();

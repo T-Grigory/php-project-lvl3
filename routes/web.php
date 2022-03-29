@@ -17,7 +17,9 @@ Route::get('/', function () {
     return view('main');
 })->name('main');
 
-
 Route::resource('urls', \App\Http\Controllers\UrlController::class);
 
-Route::post('/urls/{id}/checks', [\App\Http\Controllers\UrlController::class, 'check'])->name('urlChecks');
+Route::post(
+    '/urls/{id}/checks',
+    [\App\Http\Controllers\UrlController::class, 'check']
+)->name('urlChecks.store');
