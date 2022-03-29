@@ -27,7 +27,7 @@ class UrlTest extends TestCase
                 ->insert([
                     'id' => $url['id'],
                     'name' => $url['name'],
-                    'created_at' => Carbon::create('2022', '03', '29', '11', '31', '44')
+                    'created_at' => Carbon::create(2022, 03, 29, 11, 31, 44)
                 ])
         );
     }
@@ -97,7 +97,7 @@ class UrlTest extends TestCase
     {
         $response = $this->get(route('urls.show', ['url' => $id]));
         $response->assertOk();
-        $date = Carbon::create('2022', '03', '29', '11', '31', '44');
+        $date = Carbon::create(2022, 03, 29, 11, 31, 44);
         $response->assertSee(["<td>{$id}</td>","<td>{$name}</td>", "<td>{$date}</td>"], false);
     }
 
