@@ -16,3 +16,7 @@ To install Page Analyzer run the command: *make setup*
 ### Start
 ***
 To run the program Page Analyzer enter the command: *make start*
+
+### View Page Analyzer on Heroku
+***
+> URL app: https://page-analyzer-2022.herokuapp.com

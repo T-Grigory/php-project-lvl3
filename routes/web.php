@@ -17,9 +17,10 @@ Route::get('/', function () {
     return view('main');
 })->name('main');
 
-Route::resource('urls', \App\Http\Controllers\UrlController::class);
+Route::resource('urls', \App\Http\Controllers\UrlController::class)
+    ->only(['index', 'show', 'store']);
 
 Route::post(
     '/urls/{id}/checks',
-    [\App\Http\Controllers\UrlController::class, 'check']
+    [\App\Http\Controllers\UrlCheckController::class, 'store']
 )->name('urlChecks.store');

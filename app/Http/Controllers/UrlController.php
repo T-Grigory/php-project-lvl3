@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use DiDom\Document;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Routing\Controller;
@@ -11,7 +10,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 
@@ -44,15 +42,16 @@ class UrlController extends Controller
 
         $name = $validator->validated()['url']['name'];
         $parsedUrl = parse_url($name);
-        $partUrl = "{$parsedUrl['scheme']}://{$parsedUrl['host']}";
+        $url = "{$parsedUrl['scheme']}://{$parsedUrl['host']}";
+        $normalizeUrl = Str::lower($url);
 
-        $id = DB::table('urls')->where('name', $partUrl)->value('id');
+        $id = DB::table('urls')->where('name', $normalizeUrl)->value('id');
 
         $message = 'Страница уже существует';
 
         if (is_null($id)) {
-            DB::table('urls')->insert(['name' => $partUrl, 'created_at' => Carbon::now()]);
-            $id = DB::table('urls')->where('name', $partUrl)->value('id');
+            DB::table('urls')->insert(['name' => $normalizeUrl, 'created_at' => Carbon::now()]);
+            $id = DB::table('urls')->where('name', $normalizeUrl)->value('id');
             $message = 'Страница успешно добавлена';
         }
         flash($message)->info();
@@ -64,43 +63,8 @@ class UrlController extends Controller
         $url = DB::table('urls')->find($id);
         $urlCheck = DB::table('url_checks')->where('url_id', $id)->orderByDesc('created_at')->get();
 
-        if (empty($url)) {
-            abort(404);
-        }
+        abort_unless($url, 404);
+
         return view('url', ['url' => $url, 'urlCheck' => $urlCheck]);
-    }
-
-    public function check(int $id): Redirector|RedirectResponse
-    {
-        $url = DB::table('urls')->find($id);
-
-        if (empty($url)) {
-            abort_unless($url, 404);
-        }
-
-        try {
-            $response = Http::get($url->name);
-
-            $document = new Document($response->body());
-            $title = optional($document->first('title'))->text();
-            $h1 = optional($document->first('h1'))->text();
-            $description = optional($document->first('meta[name=description]'))->attr('content');
-            $statusCode = $response->status();
-        } catch (\Exception $exception) {
-            flash($exception->getMessage())->error();
-            return redirect()->route('urls.show', ['url' => $id]);
-        }
-
-        DB::table('url_checks')->insert([
-            'url_id' => $id,
-            'status_code' => $statusCode,
-            'h1' => Str::limit($h1, 255, ''),
-            'title' => Str::limit($title, 255, ''),
-            'description' => Str::limit($description, 255, ''),
-            'created_at' => Carbon::now()
-        ]);
-
-        flash('Страница успешно проверена')->info();
-        return redirect()->route('urls.show', ['url' => $id]);
     }
 }
